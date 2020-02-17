@@ -1,0 +1,24 @@
+# CircleCI build config example for implementation of the Aqua Security MicroScanner
+# https://github.com/aquasecurity/microscanner
+
+version: 2.1
+
+orbs:
+  microscanner: aquasecurity/microscanner@dev:0.0.1
+
+jobs:
+  docker-build:
+    executor: microscanner/default
+    steps:
+      - checkout
+      - run: docker build -t circleci/node:latest .
+
+workflows:
+  scan-image:
+    jobs:
+      - docker-build
+      - microscanner/scan-image:
+          requires:
+            - docker-build
+          context: microscanner
+          image: circleci/node:latest
